@@ -1,21 +1,43 @@
 const Book = require("../model/bookSchema");
+const Author = require("../model/authorSchema");
 
 class SearchController {
   // search
   async searchBook(req, res) {
     try {
-      const keySearch = req.query.q.trim();
+      // xử lý bỏ khoảng trắng hai đầu và ở giữa các từ
+      const keySearch = req.query.q.replace(/\s+/g, " ").trim();
+
       if (!keySearch) {
-        return res.status(403).json("khong key search");
+        return res.status(403).json("không key search");
       }
-      const books = await Book.find({ name: { $regex: keySearch } })
-        .limit(req.query.perRequest)
-        .sort({ priorityPoints: 1 });
-      if (books && books.length > 0) {
-        // handle logic sort pagination
-        res.status(200).json(books);
+
+      let resultSearch = await Book.find({ name: { $regex: keySearch } })
+        .limit(1)
+        .sort({ priorityPoints: -1 });
+
+      if (req.query.type === "books" && req.query.limit === "full") {
+        resultSearch = await Book.find({ name: { $regex: keySearch } }).sort({
+          priorityPoints: 1,
+        });
+      }
+
+      if (req.query.type === "authors") {
+        if (req.query.limit === "less") {
+          console.log("b");
+          resultSearch = await Author.find({
+            name: { $regex: keySearch },
+          }).limit(1);
+        }
+        if (req.query.limit === "full") {
+          resultSearch = await Author.find({ name: { $regex: keySearch } });
+        }
+      }
+
+      if (resultSearch && resultSearch.length > 0) {
+        res.status(200).json(resultSearch);
       } else {
-        res.status(404).json("khong có kêt quả");
+        res.status(404).json("không có kết quả");
       }
     } catch (error) {
       res.status(500).json("sai: ");
