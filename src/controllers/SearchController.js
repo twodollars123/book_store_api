@@ -13,7 +13,7 @@ class SearchController {
       }
 
       let resultSearch = await Book.find({ name: { $regex: keySearch } })
-        .limit(1)
+        .limit(5)
         .sort({ priorityPoints: -1 });
 
       if (req.query.type === "books" && req.query.limit === "full") {
@@ -24,10 +24,9 @@ class SearchController {
 
       if (req.query.type === "authors") {
         if (req.query.limit === "less") {
-          console.log("b");
           resultSearch = await Author.find({
             name: { $regex: keySearch },
-          }).limit(1);
+          }).limit(5);
         }
         if (req.query.limit === "full") {
           resultSearch = await Author.find({ name: { $regex: keySearch } });
@@ -37,7 +36,7 @@ class SearchController {
       if (resultSearch && resultSearch.length > 0) {
         res.status(200).json(resultSearch);
       } else {
-        res.status(404).json("không có kết quả");
+        res.status(403).json("không có kết quả");
       }
     } catch (error) {
       res.status(500).json("sai: ");
