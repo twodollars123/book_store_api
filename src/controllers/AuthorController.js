@@ -23,12 +23,42 @@ class AuthorController {
     }
   }
 
+  async getAuthorPerPage(req, res) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const perPage = parseInt(req.query.perpage) || 5;
+      const totalAuthors = await Author.countDocuments();
+      const totalPages = Math.ceil(totalAuthors / perPage);
+      const authors = await Author.find()
+        .skip(perPage * (page - 1))
+        .limit(perPage);
+      if (!authors) {
+        res.status(404).json("not found authors");
+      }
+      res.status(200).json({
+        data: authors,
+        currentPage: page,
+        perPage,
+        totalAuthors,
+        totalPages,
+      });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
   async updateAuthor(req, res) {
     try {
-      const author = await Author.findById(req.body._id);
-      if (author) {
-        await author.updateOne({ $set: req.body });
-        res.status(200).json(author);
+      const updatedAuthor = await Author.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      if (updatedAuthor) {
+        res.status(200).json(updatedAuthor);
       }
       res.status(404).json("not an author yet");
     } catch (error) {

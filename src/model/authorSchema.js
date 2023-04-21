@@ -14,6 +14,8 @@ const authorSchema = new mongoose.Schema(
       type: String,
     },
     books: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }],
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );
