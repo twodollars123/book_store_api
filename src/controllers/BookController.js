@@ -61,13 +61,15 @@ class BookController {
     try {
       const perPage = req.query.perPage || 5;
       const page = req.query.page || 1;
+      const totalBooks = await Book.countDocuments();
+      const totalPages = Math.ceil(totalBooks / perPage);
       await Book.find()
         .sort({ createdAt: -1 })
         .skip(perPage * page - perPage)
         .limit(perPage)
         .exec((err, books) => {
           if (err) res.status(404).json("falure");
-          res.status(200).json(books);
+          res.status(200).json({ data: books, totalPages });
         });
     } catch (error) {
       res.status(500).json(error);

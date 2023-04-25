@@ -69,11 +69,11 @@ class AuthorController {
   async deleteAuthor(req, res) {
     try {
       await Book.updateMany(
-        { author: req.body._id },
+        { author: req.params.id },
         { isAble: false, author: null }
       );
-      await Author.findByIdAndDelete(req.body._id);
-      res.status(200).json("delete successfully");
+      const deletedAuthor = await Author.findByIdAndDelete(req.params.id);
+      res.status(200).json(deletedAuthor);
     } catch (error) {
       res.status(500).json(error);
     }

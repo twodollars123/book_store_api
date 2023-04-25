@@ -10,7 +10,11 @@ router.put(
   middlewareController.verifyTokenAndAdminAuth,
   authorController.updateAuthor
 );
-router.delete("/", authorController.deleteAuthor);
+router.delete(
+  "/:id",
+  middlewareController.verifyTokenAndAdminAuth,
+  authorController.deleteAuthor
+);
 router.get("/getpage", authorController.getAuthorPerPage);
 router.get("/", authorController.getAllAuthor);
 
