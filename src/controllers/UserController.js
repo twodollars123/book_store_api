@@ -27,6 +27,21 @@ class UserController {
     }
   }
 
+  async update(req, res) {
+    try {
+      const newUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+      });
+      if (!newUser) {
+        res.status(404).json("not found");
+      }
+      res.status(200).json(newUser);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
   //[DELETE] /user/:id
   async deleteUserById(req, res) {
     try {

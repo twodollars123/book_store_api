@@ -38,7 +38,8 @@ class BookController {
 
   async getAllBook(req, res) {
     try {
-      const allBooks = await Book.find();
+      const allBooks = await Book.find().sort({ createdAt: -1 });
+
       res.status(200).json(allBooks);
     } catch (error) {
       res.status(500).json(error);

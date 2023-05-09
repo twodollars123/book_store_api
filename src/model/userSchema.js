@@ -28,7 +28,7 @@ const userSchema = new Schema(
     avater: {
       type: String,
     },
-    cart: [{ type: mongoose.Schema.Types.ObjectId, ref: book }],
+    cart: { type: mongoose.Schema.Types.ObjectId, ref: "cart" },
     isadmin: {
       type: Boolean,
       default: false,
