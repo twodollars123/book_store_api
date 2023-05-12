@@ -17,7 +17,7 @@ class CartController {
   }
   async getCartById(req, res) {
     try {
-      const cart = await Cart.findById(req.params.id);
+      const cart = await Cart.findOne({ user: req.params.id });
       if (cart) {
         res.status(200).json(cart);
       }
@@ -44,7 +44,6 @@ class CartController {
       } else {
         // kieem tra san pham do co ton taij khong
         const book = await Book.findById(req.body.itemId);
-        console.log("c", book);
         if (!book) {
           res.json("san pham khong ton tai");
         } else {
@@ -55,7 +54,8 @@ class CartController {
           if (existItem !== -1) {
             //da co thi tang so luong len 1 va tong tien tang
             cart.items[existItem].quantity++;
-            // cart.items[existItem].totalPrice =
+            cart.items[existItem].totalPrice +=
+              cart.items[existItem].totalPrice;
           } else {
             cart.items.push(req.body);
           }
@@ -74,20 +74,28 @@ class CartController {
       if (!cart) {
         res.json("khong co gio hang");
       }
-      const index = cart.items.findIndex((item) => item._id === req.body.id);
-      if (!index) {
+      //log
+      const index = cart.items.findIndex(
+        (item) => item._id.toString() === req.body.id
+      );
+      console.log("index", index);
+      if (index === -1) {
         res.json("khong co item");
       }
       if (req.body.quantity === 0) {
         cart.items = cart.items.filter((item) => item !== cart.items[index]);
         const save = await cart.save();
-        res.json(save);
-      } else {
-        console.log("b");
-        cart.items[index].quantity = req.body.quantity;
+        return res.json(save);
+      }
+      if (req.body.quantity > cart.items[index].quantity) {
+        cart.items[index].quantity++;
         const save = await cart.save();
-        console.log("a", save);
-        res.json(save);
+        return res.json(save);
+      }
+      if (req.body.quantity < cart.items[index].quantity) {
+        cart.items[index].quantity--;
+        const save = await cart.save();
+        return res.json(save);
       }
     } catch (error) {
       res.status(500).json(error);
