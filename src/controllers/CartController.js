@@ -54,8 +54,6 @@ class CartController {
           if (existItem !== -1) {
             //da co thi tang so luong len 1 va tong tien tang
             cart.items[existItem].quantity++;
-            cart.items[existItem].totalPrice +=
-              cart.items[existItem].totalPrice;
           } else {
             cart.items.push(req.body);
           }
@@ -78,7 +76,6 @@ class CartController {
       const index = cart.items.findIndex(
         (item) => item._id.toString() === req.body.id
       );
-      console.log("index", index);
       if (index === -1) {
         res.json("khong co item");
       }
@@ -97,6 +94,76 @@ class CartController {
         const save = await cart.save();
         return res.json(save);
       }
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async incrementQuantity(req, res) {
+    try {
+      const cart = await Cart.findOne({ user: req.params.idUser });
+      if (!cart) {
+        res.json("khong co gio hang");
+      }
+      console.log("itemId", req.body.itemId);
+      const index = cart.items.findIndex(
+        (item) => item.itemId.toString() === req.body.itemId
+      );
+      if (index === -1) {
+        res.json("khong co item");
+      }
+      cart.items[index].quantity++;
+      const save = await cart.save();
+      return res.json(save);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async decrementQuantity(req, res) {
+    try {
+      const cart = await Cart.findOne({ user: req.params.idUser });
+      if (!cart) {
+        res.json("khong co gio hang");
+      }
+      const index = cart.items.findIndex(
+        (item) => item.itemId.toString() === req.body.itemId
+      );
+      if (index === -1) {
+        res.json("khong co item");
+      }
+      if (cart.items[index].quantity === 1) {
+        cart.items = cart.items.filter((item) => item !== cart.items[index]);
+      } else {
+        cart.items[index].quantity--;
+      }
+      const save = await cart.save();
+      return res.json(save);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async removecart(req, res) {
+    try {
+      const cart = await Cart.findOne({ user: req.params.idUser });
+      if (!cart) {
+        res.json("khong co gio hang");
+      }
+      const index = cart.items.findIndex(
+        (item) => item.itemId.toString() === req.body.itemId
+      );
+      if (index === -1) {
+        res.json("khong co item");
+      }
+      // cart.items = cart.items.filter((item) => item !== cart.items[index]);
+
+      await Cart.updateMany(
+        { items: cart.items[index] },
+        { $pull: { items: cart.items[index] } }
+      );
+      // const save = await cart.save();
+      return res.json(" remove successful");
     } catch (error) {
       res.status(500).json(error);
     }

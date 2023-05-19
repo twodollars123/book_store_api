@@ -91,6 +91,20 @@ class BookController {
     }
   }
 
+  async decrementQuantity(req, res) {
+    try {
+      const book = await Book.findById(req.body._id);
+      if (!book) {
+        res.status(404).json("khong tim thay sach");
+      }
+      book.inventoryQuantity = book.inventoryQuantity - req.body.quantity;
+      await book.save();
+      res.status(200).json("decrement quatity successful");
+    } catch (error) {
+      res.status.json(error);
+    }
+  }
+
   async deleteABook(req, res) {
     try {
       await Author.updateMany(
@@ -121,6 +135,14 @@ class BookController {
           if (err) res.status(404).json("falure");
           res.status(200).json(books);
         });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async updateManyQuantity(req, res) {
+    try {
+      await Book.updateMany({}, { $set: { inventoryQuantity: 100 } });
     } catch (error) {
       res.status(500).json(error);
     }

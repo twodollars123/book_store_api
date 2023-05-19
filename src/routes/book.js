@@ -9,6 +9,8 @@ router.get("/:id", bookController.getABookById);
 router.get("/", bookController.getAllBook);
 router.post("/listfavourite/", bookController.getListFavouriteBooks);
 router.put("/", bookController.updateABook);
+router.put("/decrementquantity", bookController.decrementQuantity);
+router.put("/updateMany", bookController.updateManyQuantity);
 router.delete("/", bookController.deleteABook);
 
 module.exports = router;
