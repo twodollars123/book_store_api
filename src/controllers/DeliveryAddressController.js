@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const DeliveryAddress = require("../model/deliveryAddressSchema");
+const { trace } = require("../routes/order");
 
 class DeliveryAddressController {
   async create(req, res) {
@@ -32,6 +33,15 @@ class DeliveryAddressController {
           res.status(404).json("chua co dia chi nhan hang");
         }
       }
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async getAllAddress(req, res) {
+    try {
+      const address = await DeliveryAddress.find();
+      res.status(200).json(address);
     } catch (error) {
       res.status(500).json(error);
     }

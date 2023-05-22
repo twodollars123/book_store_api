@@ -18,7 +18,7 @@ const bookSchema = new Schema(
     thumnel: { type: String, require: true },
     price: { type: Number, require: true },
     inventoryQuantity: { type: Number, require: true },
-    purchasedQuantity: { type: Number },
+    purchasedQuantity: { type: Number, default: 0 },
     assessStar: { type: Number },
     genres: [
       { type: mongoose.Schema.Types.ObjectId, ref: "genre", require: true },

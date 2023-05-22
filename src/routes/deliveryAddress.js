@@ -6,6 +6,7 @@ const deliveryAddressController = require("../controllers/DeliveryAddressControl
 router.post("/create", deliveryAddressController.create);
 router.get("/:idUser/getdefault", deliveryAddressController.getDefault);
 router.get("/:idUser", deliveryAddressController.getAll);
+router.get("/", deliveryAddressController.getAllAddress);
 router.post("/changeselected", deliveryAddressController.changeSelected);
 
 module.exports = router;

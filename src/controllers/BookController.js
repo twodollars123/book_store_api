@@ -87,7 +87,7 @@ class BookController {
       }
       res.status(404).json("not found");
     } catch (error) {
-      res.status.json(error);
+      res.status(500).json(error);
     }
   }
 
@@ -99,9 +99,51 @@ class BookController {
       }
       book.inventoryQuantity = book.inventoryQuantity - req.body.quantity;
       await book.save();
-      res.status(200).json("decrement quatity successful");
+      res.status(200).json("decrement quantity successful");
     } catch (error) {
-      res.status.json(error);
+      res.status(500).json(error);
+    }
+  }
+  async incrementInventoryQuantity(req, res) {
+    try {
+      const book = await Book.findById(req.body._id);
+      if (!book) {
+        res.status(404).json("khong tim thay sach");
+      }
+      book.inventoryQuantity = book.inventoryQuantity + req.body.quantity;
+      await book.save();
+      res.status(200).json("increment inventory quantity successful");
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async updatePurchasedQuantity(req, res) {
+    // body {_id,quanity, type: confirm order or cancel order}
+    try {
+      const book = await Book.findById(req.body._id);
+      if (!book) {
+        res.status(404).json("khong tim thay sach");
+      }
+      if (req.body.type === "confirm order") {
+        console.log("a");
+        book.purchasedQuantity = book.purchasedQuantity + req.body.quantity;
+        console.log("b");
+      }
+
+      if (req.body.type === "cancel order") {
+        if (book.purchasedQuantity >= 0) {
+          if (book.purchasedQuantity > req.body.quantity) {
+            book.purchasedQuantity = book.purchasedQuantity - req.body.quantity;
+          } else {
+            book.purchasedQuantity = 0;
+          }
+        }
+      }
+      await book.save();
+      res.status(200).json("update purchased quantity successful");
+    } catch (error) {
+      res.status(500).json(error);
     }
   }
 

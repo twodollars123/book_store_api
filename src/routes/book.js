@@ -10,6 +10,8 @@ router.get("/", bookController.getAllBook);
 router.post("/listfavourite/", bookController.getListFavouriteBooks);
 router.put("/", bookController.updateABook);
 router.put("/decrementquantity", bookController.decrementQuantity);
+router.put("/incrementinventory", bookController.incrementInventoryQuantity);
+router.put("/updatepurchasedquantity", bookController.updatePurchasedQuantity);
 router.put("/updateMany", bookController.updateManyQuantity);
 router.delete("/", bookController.deleteABook);
 
