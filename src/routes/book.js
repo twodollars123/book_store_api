@@ -12,6 +12,7 @@ router.put("/", bookController.updateABook);
 router.put("/decrementquantity", bookController.decrementQuantity);
 router.put("/incrementinventory", bookController.incrementInventoryQuantity);
 router.put("/updatepurchasedquantity", bookController.updatePurchasedQuantity);
+router.put("/updateprioritypoints", bookController.updatePriorityPoints);
 router.put("/updateMany", bookController.updateManyQuantity);
 router.delete("/", bookController.deleteABook);
 

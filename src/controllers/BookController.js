@@ -166,7 +166,7 @@ class BookController {
 
   async getListFavouriteBooks(req, res) {
     try {
-      const perPage = req.query.perPage || 5;
+      const perPage = req.query.perPage || 20;
       const page = req.query.page || 1;
       await Book.find()
         .skip(perPage * page - perPage)
@@ -177,6 +177,51 @@ class BookController {
           if (err) res.status(404).json("falure");
           res.status(200).json(books);
         });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async updatePriorityPoints(req, res) {
+    //body{type: "addtocart" || "order", authorId, genreId, bookId}
+    try {
+      if (req.body.type === "addtocart") {
+        console.log("vao if", req.body.bookId);
+
+        await Book.findByIdAndUpdate(
+          req.body.bookId,
+          {
+            $inc: { priorityPoints: 5 },
+          },
+          { new: true }
+        );
+        console.log(" bookID ok");
+        await Book.updateMany(
+          { author: req.body.authorId },
+          { $inc: { priorityPoints: 2 } }
+        );
+        console.log(" author ok");
+
+        await Book.updateMany(
+          { genres: { $in: req.body.genreId } },
+          { $inc: { priorityPoints: 2 } }
+        );
+        console.log(" genres ok");
+      }
+      if (req.body.type === "order") {
+        await Book.updateMany(
+          { author: req.body.authorId },
+          { $inc: { priorityPoints: 2 } }
+        );
+        await Book.updateMany(
+          { genres: { $in: req.body.genreId } },
+          { $inc: { priorityPoints: 2 } }
+        );
+        await Book.findByIdAndUpdate(req.body.bookId, {
+          priorityPoints: 0,
+        });
+      }
+      res.status(200).json("Update successfully");
     } catch (error) {
       res.status(500).json(error);
     }
