@@ -8,7 +8,7 @@ class AuthorController {
     try {
       const newAuthor = await new Author(req.body);
       const savedAuthor = await newAuthor.save();
-      res.status(200).json(savedAuthor);
+      return res.status(200).json(savedAuthor);
     } catch (error) {
       res.status(500).json(error);
     }
@@ -17,7 +17,7 @@ class AuthorController {
   async getAllAuthor(req, res) {
     try {
       const allAuthors = await Author.find();
-      res.status(200).json(allAuthors);
+      return res.status(200).json(allAuthors);
     } catch (error) {
       res.status(500).json(error);
     }
@@ -33,9 +33,9 @@ class AuthorController {
         .skip(perPage * (page - 1))
         .limit(perPage);
       if (!authors) {
-        res.status(404).json("not found authors");
+        return res.status(404).json("not found authors");
       }
-      res.status(200).json({
+      return res.status(200).json({
         data: authors,
         currentPage: page,
         perPage,
@@ -43,7 +43,7 @@ class AuthorController {
         totalPages,
       });
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -58,11 +58,11 @@ class AuthorController {
         }
       );
       if (updatedAuthor) {
-        res.status(200).json(updatedAuthor);
+        return res.status(200).json(updatedAuthor);
       }
-      res.status(404).json("not an author yet");
+      return res.status(404).json("not an author yet");
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -73,9 +73,23 @@ class AuthorController {
         { isAble: false, author: null }
       );
       const deletedAuthor = await Author.findByIdAndDelete(req.params.id);
-      res.status(200).json(deletedAuthor);
+      return res.status(200).json(deletedAuthor);
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
+    }
+  }
+
+  async getById(req, res) {
+    // id lấy từ params
+    try {
+      const id = req.params.id;
+      const author = await Author.findById(id);
+      if (!author) {
+        return res.status(404).json("not found author yet");
+      }
+      return res.status(200).json(author);
+    } catch (error) {
+      return res.status(500).json(error);
     }
   }
 }

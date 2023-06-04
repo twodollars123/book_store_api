@@ -8,21 +8,21 @@ class CartController {
     try {
       const cart = await Cart.find();
       if (!cart) {
-        res.json("do not have a book yet!");
+        return res.json("do not have a book yet!");
       }
-      res.json(cart);
+      return res.json(cart);
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
   async getCartById(req, res) {
     try {
       const cart = await Cart.findOne({ user: req.params.id });
       if (cart) {
-        res.status(200).json(cart);
+        return res.status(200).json(cart);
       }
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -30,9 +30,9 @@ class CartController {
     try {
       const newCart = new Cart(req.body);
       const saveCart = await newCart.save();
-      res.status(200).json(saveCart);
+      return res.status(200).json(saveCart);
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -40,12 +40,12 @@ class CartController {
     try {
       const cart = await Cart.findOne({ user: req.params.idUser });
       if (!cart) {
-        res.json("chua co cart");
+        return res.json("chua co cart");
       } else {
         // kieem tra san pham do co ton taij khong
         const book = await Book.findById(req.body.itemId);
         if (!book) {
-          res.json("san pham khong ton tai");
+          return res.json("san pham khong ton tai");
         } else {
           //kiem tra san pham them da co trong items chua
           const existItem = cart.items.findIndex((item) =>
@@ -60,9 +60,9 @@ class CartController {
         }
       }
       const save = await cart.save();
-      res.json(save);
+      return res.json(save);
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -70,14 +70,14 @@ class CartController {
     try {
       const cart = await Cart.findOne({ user: req.params.idUser });
       if (!cart) {
-        res.json("khong co gio hang");
+        return res.json("khong co gio hang");
       }
       //log
       const index = cart.items.findIndex(
         (item) => item._id.toString() === req.body.id
       );
       if (index === -1) {
-        res.json("khong co item");
+        return res.json("khong co item");
       }
       if (req.body.quantity === 0) {
         cart.items = cart.items.filter((item) => item !== cart.items[index]);
@@ -95,7 +95,7 @@ class CartController {
         return res.json(save);
       }
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -103,20 +103,20 @@ class CartController {
     try {
       const cart = await Cart.findOne({ user: req.params.idUser });
       if (!cart) {
-        res.json("khong co gio hang");
+        return res.json("khong co gio hang");
       }
       console.log("itemId", req.body.itemId);
       const index = cart.items.findIndex(
         (item) => item.itemId.toString() === req.body.itemId
       );
       if (index === -1) {
-        res.json("khong co item");
+        return res.json("khong co item");
       }
       cart.items[index].quantity++;
       const save = await cart.save();
       return res.json(save);
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -124,13 +124,13 @@ class CartController {
     try {
       const cart = await Cart.findOne({ user: req.params.idUser });
       if (!cart) {
-        res.json("khong co gio hang");
+        return res.json("khong co gio hang");
       }
       const index = cart.items.findIndex(
         (item) => item.itemId.toString() === req.body.itemId
       );
       if (index === -1) {
-        res.json("khong co item");
+        return res.json("khong co item");
       }
       if (cart.items[index].quantity === 1) {
         cart.items = cart.items.filter((item) => item !== cart.items[index]);
@@ -140,7 +140,7 @@ class CartController {
       const save = await cart.save();
       return res.json(save);
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -148,13 +148,13 @@ class CartController {
     try {
       const cart = await Cart.findOne({ user: req.params.idUser });
       if (!cart) {
-        res.json("khong co gio hang");
+        return res.json("khong co gio hang");
       }
       const index = cart.items.findIndex(
         (item) => item.itemId.toString() === req.body.itemId
       );
       if (index === -1) {
-        res.json("khong co item");
+        return res.json("khong co item");
       }
       // cart.items = cart.items.filter((item) => item !== cart.items[index]);
 
@@ -165,7 +165,7 @@ class CartController {
       // const save = await cart.save();
       return res.json(" remove successful");
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 }

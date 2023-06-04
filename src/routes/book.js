@@ -3,11 +3,12 @@ const router = express.Router();
 
 const bookController = require("../controllers/BookController");
 
+router.get("/bestseller/", bookController.getBestSellerList);
 router.post("/pagination/", bookController.getBooksLimit);
 router.post("/", bookController.createOne);
 router.get("/:id", bookController.getABookById);
 router.get("/", bookController.getAllBook);
-router.post("/listfavourite/", bookController.getListFavouriteBooks);
+router.post("/listfavourite", bookController.getListFavouriteBooks);
 router.put("/", bookController.updateABook);
 router.put("/decrementquantity", bookController.decrementQuantity);
 router.put("/incrementinventory", bookController.incrementInventoryQuantity);

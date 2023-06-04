@@ -16,6 +16,7 @@ router.delete(
   authorController.deleteAuthor
 );
 router.get("/getpage", authorController.getAuthorPerPage);
+router.get("/:id", authorController.getById);
 router.get("/", authorController.getAllAuthor);
 
 module.exports = router;

@@ -13,7 +13,9 @@ class BookController {
         if (author && !author.books.includes(newBook._id)) {
           await author.updateOne({ $push: { books: savedBook._id } });
         } else {
-          res.status(401).json("chưa có author hoặc đã có sách trong database");
+          return res
+            .status(401)
+            .json("chưa có author hoặc đã có sách trong database");
         }
       }
       if (newBook.genres) {
@@ -24,15 +26,15 @@ class BookController {
               $push: { books: newBook._id },
             });
           } else {
-            res
+            return res
               .status(401)
               .json("chưa có genre hoặc đã có sách trong database");
           }
         });
       }
-      res.status(200).json(savedBook);
+      return res.status(200).json(savedBook);
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -40,9 +42,18 @@ class BookController {
     try {
       const allBooks = await Book.find().sort({ createdAt: -1 });
 
-      res.status(200).json(allBooks);
+      return res.status(200).json(allBooks);
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
+    }
+  }
+
+  async getBestSellerList(req, res) {
+    try {
+      const books = await Book.find().sort({ purchasedQuantity: -1 }).limit(5);
+      return res.status(200).json(books);
+    } catch (error) {
+      return res.status(500).json(error);
     }
   }
 
@@ -50,11 +61,11 @@ class BookController {
     try {
       const book = await Book.findById(req.params.id);
       if (book) {
-        res.status(200).json(book);
+        return res.status(200).json(book);
       }
-      res.status(404).json("not found the book");
+      return res.status(404).json("not found the book");
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -70,10 +81,10 @@ class BookController {
         .limit(perPage)
         .exec((err, books) => {
           if (err) res.status(404).json("falure");
-          res.status(200).json({ data: books, totalPages });
+          return res.status(200).json({ data: books, totalPages });
         });
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -83,11 +94,11 @@ class BookController {
       if (book) {
         await book.updateOne({ $set: req.body });
         const savedBook = await book.save();
-        res.status(200).json(savedBook);
+        return res.status(200).json(savedBook);
       }
-      res.status(404).json("not found");
+      return res.status(404).json("not found");
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -95,26 +106,26 @@ class BookController {
     try {
       const book = await Book.findById(req.body._id);
       if (!book) {
-        res.status(404).json("khong tim thay sach");
+        return res.status(404).json("khong tim thay sach");
       }
       book.inventoryQuantity = book.inventoryQuantity - req.body.quantity;
       await book.save();
-      res.status(200).json("decrement quantity successful");
+      return res.status(200).json("decrement quantity successful");
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
   async incrementInventoryQuantity(req, res) {
     try {
       const book = await Book.findById(req.body._id);
       if (!book) {
-        res.status(404).json("khong tim thay sach");
+        return res.status(404).json("khong tim thay sach");
       }
       book.inventoryQuantity = book.inventoryQuantity + req.body.quantity;
       await book.save();
-      res.status(200).json("increment inventory quantity successful");
+      return res.status(200).json("increment inventory quantity successful");
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -123,7 +134,7 @@ class BookController {
     try {
       const book = await Book.findById(req.body._id);
       if (!book) {
-        res.status(404).json("khong tim thay sach");
+        return res.status(404).json("khong tim thay sach");
       }
       if (req.body.type === "confirm order") {
         console.log("a");
@@ -141,9 +152,9 @@ class BookController {
         }
       }
       await book.save();
-      res.status(200).json("update purchased quantity successful");
+      return res.status(200).json("update purchased quantity successful");
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -158,27 +169,32 @@ class BookController {
         { $pull: { books: req.body._id } }
       );
       await Book.findByIdAndDelete(req.body._id);
-      res.status(200).json("delete successfully");
+      return res.status(200).json("delete successfully");
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
   async getListFavouriteBooks(req, res) {
+    //body{perPage, page}
     try {
-      const perPage = req.query.perPage || 20;
-      const page = req.query.page || 1;
+      const perPage = req.body.perPage || 20;
+      const page = req.body.page || 1;
+      // const totalBook = await Book.count();
+      // const totalPages = Math.ceil((totalBook - 20) / 10 + 1);
       await Book.find()
-        .skip(perPage * page - perPage)
         .sort({ priorityPoints: -1 })
+        .skip(perPage * page - perPage)
         .limit(perPage)
 
         .exec((err, books) => {
           if (err) res.status(404).json("falure");
-          res.status(200).json(books);
+          return res
+            .status(200)
+            .json({ page: page, perPage: perPage, data: books });
         });
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -221,9 +237,9 @@ class BookController {
           priorityPoints: 0,
         });
       }
-      res.status(200).json("Update successfully");
+      return res.status(200).json("Update successfully");
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 
@@ -231,7 +247,7 @@ class BookController {
     try {
       await Book.updateMany({}, { $set: { inventoryQuantity: 100 } });
     } catch (error) {
-      res.status(500).json(error);
+      return res.status(500).json(error);
     }
   }
 }

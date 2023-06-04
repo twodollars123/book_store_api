@@ -32,7 +32,7 @@ class Auth {
       });
       //save on db
       const user = await newUser.save();
-      res.status(200).json(user);
+      return res.status(200).json(user);
     } catch (err) {
       res.status(500).json(err);
     }
@@ -62,7 +62,7 @@ class Auth {
           sameSite: "strict",
         });
         const { password, ...others } = user._doc;
-        res.status(200).json({ ...others, accessToken });
+        return res.status(200).json({ ...others, accessToken });
       }
     } catch (err) {
       res.status(500).json(err);
@@ -74,17 +74,17 @@ class Auth {
     if (!refreshToken) return res.status(401).json("You're not authencated");
     jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, user) => {
       if (err) {
-        res.status(403).json("token is not valid");
+        return res.status(403).json("token is not valid");
       }
       const newAccessToken = generateAccessToken(user);
       const newRefreshToken = generateRefreshToken(user);
-      res.cookie("refreshToken", newRefreshToken, {
+      return res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
         secure: false,
         path: "/",
         sameSite: "strict",
       });
-      res.status(200).json(newAccessToken);
+      // return res.status(200).json(newAccessToken);
     });
   }
 
